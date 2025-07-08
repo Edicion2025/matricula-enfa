@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Matrícula ENFA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: linear-gradient(to right, #f0f4ff, #ffeaea);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .card img {
+      width: 120px;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      margin-bottom: 1rem;
+      color: #d71920;
+      font-size: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.4rem;
+      text-align: left;
+      font-weight: 600;
+      color: #1d3557;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 1.2rem;
+      font-size: 1rem;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #d71920;
+    }
+
+    .error {
+      border-color: red !important;
+      background-color: #ffe5e5;
+    }
+
+    .message {
+      padding: 1rem;
+      margin-top: 1rem;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    .message.success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .message.error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.9rem;
+      background: #1d3557;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #143048;
+    }
+
+    @media (max-width: 500px) {
+      .card {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <img class="logo" src="ENFA-removebg-preview.png" alt="Logo ENFA">
+    <h1>Matrícula ENFA</h1>
+
+    <form id="form-cita" novalidate>
+      <label for="nombre">Nombre y Apellidos</label>
+      <input type="text" name="nombre" id="nombre" required>
+
+      <label for="ci">Número de CI</label>
+      <input type="text" name="ci" id="ci" required>
+
+      <label for="municipio">Municipio</label>
+      <select name="municipio" id="municipio" required>
+        <option value="">Selecciona municipio</option>
+        <option value="Guanabacoa">Guanabacoa</option>
+        <option value="Arroyo Naranjo">Arroyo Naranjo</option>
+        <option value="Marianao">Marianao</option>
+        <option value="Regla">Regla</option>
+        <option value="Cotorro">Cotorro</option>
+        <option value="Víbora">Víbora</option>
+        <option value="Playa">Playa</option>
+        <option value="Boyeros">Boyeros</option>
+        <option value="Centro Habana">Centro Habana</option>
+        <option value="10 de Octubre">10 de Octubre</option>
+        <option value="La Habana Vieja">La Habana Vieja</option>
+      </select>
+
+      <label for="ipu">IPU (Instituto Preuniversitario)</label>
+      <input type="text" name="ipu" id="ipu" required>
+
+      <label for="fecha">Fecha de la Cita</label>
+      <select name="fecha" id="fecha" required>
+        <option value="">Selecciona fecha</option>
+        <option value="2025-07-21">21 de Julio de 2025</option>
+        <option value="2025-07-22">22 de Julio de 2025</option>
+      </select>
+
+      <button type="submit">Enviar</button>
+      <div id="message" class="message" style="display: none;"></div>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('form-cita');
+    const messageDiv = document.getElementById('message');
+    const logo = document.querySelector('.logo');
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      // Reset styles and message
+      messageDiv.style.display = 'none';
+      messageDiv.textContent = '';
+      messageDiv.className = 'message';
+      const inputs = form.querySelectorAll('input, select');
+      inputs.forEach(input => input.classList.remove('error'));
+
+      // Validación de campos
+      let isValid = true;
+      inputs.forEach(input => {
+        if (!input.value.trim()) {
+          input.classList.add('error');
+          isValid = false;
+        }
+      });
+
+      if (!isValid) {
+        messageDiv.textContent = '❌ Por favor completa todos los campos.';
+        messageDiv.classList.add('error');
+        messageDiv.style.display = 'block';
+        return;
+      }
+
+      const data = new FormData(form);
+      const values = Object.fromEntries(data.entries());
+
+      try {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbzqTUluyDjMRm_VcuNLVPKbWxw9FiGNMhc5XHVzT1iExLnvUQPgaqHu7wAgUPQSAxKQ/exec', {
+          method: 'POST',
+          body: new URLSearchParams(values),
+        });
+
+        const result = await response.json();
+
+        if (result.status === 'success') {
+          // Mostrar mensaje "Te esperamos"
+          messageDiv.textContent = '✅ Te esperamos el día de la cita. ¡Nos vemos pronto!';
+          messageDiv.classList.add('success');
+          messageDiv.style.display = 'block';
+          form.reset();
+          logo.style.display = 'none';
+        } else {
+          messageDiv.textContent = '⚠️ Ocurrió un error al enviar el formulario.';
+          messageDiv.classList.add('error');
+          messageDiv.style.display = 'block';
+        }
+      } catch (error) {
+        messageDiv.textContent = '⚠️ No se pudo conectar con el servidor.';
+        messageDiv.classList.add('error');
+        messageDiv.style.display = 'block';
+      }
+    });
+  </script>
+
+</body>
+</html>
